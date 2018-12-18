@@ -1,5 +1,6 @@
 use crate::geometry::{Point, Size};
 
+#[repr(C)]
 #[derive(Debug)]
 pub struct LayoutNode {
     pub size: Size<f32>,

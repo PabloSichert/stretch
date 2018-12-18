@@ -53,7 +53,8 @@ struct FlexLine<'a> {
     offset_cross: f32,
 }
 
-pub fn compute(root: &style::Node) -> layout::Node {
+#[no_mangle]
+pub extern "C" fn compute(root: &style::StyleNode) -> layout::LayoutNode {
     // TODO - Don't do two passes here just to handle min/max.
     // Probably want to pass min/max down as top level paramerer instead.
     let first_pass = compute_internal(

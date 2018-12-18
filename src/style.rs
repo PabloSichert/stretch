@@ -1,6 +1,7 @@
 use crate::geometry::{Rect, Size};
 use crate::number::Number;
 
+#[repr(C)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum AlignItems {
     FlexStart,
@@ -16,6 +17,7 @@ impl Default for AlignItems {
     }
 }
 
+#[repr(C)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum AlignSelf {
     Auto,
@@ -32,6 +34,7 @@ impl Default for AlignSelf {
     }
 }
 
+#[repr(C)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum AlignContent {
     FlexStart,
@@ -48,6 +51,7 @@ impl Default for AlignContent {
     }
 }
 
+#[repr(C)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Direction {
     Inherit,
@@ -61,6 +65,7 @@ impl Default for Direction {
     }
 }
 
+#[repr(C)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Display {
     Flex,
@@ -73,6 +78,7 @@ impl Default for Display {
     }
 }
 
+#[repr(C)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum FlexDirection {
     Row,
@@ -101,6 +107,7 @@ impl FlexDirection {
     }
 }
 
+#[repr(C)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum JustifyContent {
     FlexStart,
@@ -117,6 +124,7 @@ impl Default for JustifyContent {
     }
 }
 
+#[repr(C)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Overflow {
     Visible,
@@ -130,6 +138,7 @@ impl Default for Overflow {
     }
 }
 
+#[repr(C)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum PositionType {
     Relative,
@@ -142,6 +151,7 @@ impl Default for PositionType {
     }
 }
 
+#[repr(C)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum FlexWrap {
     NoWrap,
@@ -155,6 +165,7 @@ impl Default for FlexWrap {
     }
 }
 
+#[repr(C)]
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Dimension {
     Undefined,
@@ -191,6 +202,7 @@ impl Default for Size<Dimension> {
     }
 }
 
+#[repr(C)]
 #[derive(Debug)]
 pub struct StyleNode {
     pub position_type: PositionType,
