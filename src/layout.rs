@@ -1,8 +1,10 @@
 use crate::geometry::{Point, Size};
 
 #[derive(Debug)]
-pub struct Node {
+pub struct LayoutNode {
     pub size: Size<f32>,
     pub location: Point<f32>,
-    pub children: Vec<Node>,
+    pub children: Vec<LayoutNode>,
 }
+
+pub type Node = LayoutNode;

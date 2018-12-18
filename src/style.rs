@@ -192,7 +192,7 @@ impl Default for Size<Dimension> {
 }
 
 #[derive(Debug)]
-pub struct Node {
+pub struct StyleNode {
     pub position_type: PositionType,
     pub direction: Direction,
     pub flex_direction: FlexDirection,
@@ -223,6 +223,8 @@ pub struct Node {
 
     pub children: Vec<Node>,
 }
+
+pub type Node = StyleNode;
 
 impl Default for Node {
     fn default() -> Node {
