@@ -13,6 +13,9 @@ criterion = "0.2"
 lto = true
 panic = 'abort'
 
+[lib]
+crate-type = ["dylib"]
+
 [[bench]]
 name = "generated"
 harness = false

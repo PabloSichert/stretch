@@ -54,7 +54,17 @@ struct FlexLine<'a> {
 }
 
 #[no_mangle]
-pub extern "C" fn compute(root: &style::StyleNode) -> layout::LayoutNode {
+pub extern "C" fn unsafe_compute(root: &style::StyleNode) -> layout::LayoutNode {
+    // TODO: Need to check if Rust tries to clean up the root that was allocated in C
+    compute(&root.to_node()).to_layout_node()
+}
+
+#[no_mangle]
+pub extern "C" fn cleanup(layout: &layout::LayoutNode) {
+    drop(&layout.to_node())
+}
+
+pub fn compute(root: &style::Node) -> layout::Node {
     // TODO - Don't do two passes here just to handle min/max.
     // Probably want to pass min/max down as top level paramerer instead.
     let first_pass = compute_internal(

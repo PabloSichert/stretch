@@ -1,5 +1,6 @@
 use crate::geometry::{Rect, Size};
 use crate::number::Number;
+use crate::array::Array;
 
 #[repr(C)]
 #[derive(Copy, Clone, PartialEq, Debug)]
@@ -203,8 +204,84 @@ impl Default for Size<Dimension> {
 }
 
 #[repr(C)]
-#[derive(Debug)]
 pub struct StyleNode {
+    pub position_type: PositionType,
+    pub direction: Direction,
+    pub flex_direction: FlexDirection,
+
+    pub flex_wrap: FlexWrap,
+    pub overflow: Overflow,
+
+    pub align_items: AlignItems,
+    pub align_self: AlignSelf,
+    pub align_content: AlignContent,
+
+    pub justify_content: JustifyContent,
+
+    pub position: Rect<Dimension>,
+    pub margin: Rect<Dimension>,
+    pub padding: Rect<Dimension>,
+    pub border: Rect<Dimension>,
+
+    pub flex_grow: f32,
+    pub flex_shrink: f32,
+    pub flex_basis: Dimension,
+
+    pub size: Size<Dimension>,
+    pub min_size: Size<Dimension>,
+    pub max_size: Size<Dimension>,
+
+    pub aspect_ratio: Number,
+
+    pub children: Array<StyleNode>,
+}
+
+impl StyleNode {
+    pub(crate) fn to_node(&self) -> Node {
+        unsafe {
+            let children = Vec::from_raw_parts(
+                self.children.pointer,
+                self.children.length,
+                self.children.capacity
+            ).iter().map(|child| child.to_node()).collect();
+
+            Node {
+                position_type: self.position_type,
+                direction: self.direction,
+                flex_direction: self.flex_direction,
+
+                flex_wrap: self.flex_wrap,
+                overflow: self.overflow,
+
+                align_items: self.align_items,
+                align_self: self.align_self,
+                align_content: self.align_content,
+
+                justify_content: self.justify_content,
+
+                position: self.position,
+                margin: self.margin,
+                padding: self.padding,
+                border: self.border,
+
+                flex_grow: self.flex_grow,
+                flex_shrink: self.flex_shrink,
+                flex_basis: self.flex_basis,
+
+                size: self.size,
+                min_size: self.min_size,
+                max_size: self.max_size,
+
+                aspect_ratio: self.aspect_ratio,
+
+                children: children,
+            }
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct Node {
     pub position_type: PositionType,
     pub direction: Direction,
     pub flex_direction: FlexDirection,
@@ -235,8 +312,6 @@ pub struct StyleNode {
 
     pub children: Vec<Node>,
 }
-
-pub type Node = StyleNode;
 
 impl Default for Node {
     fn default() -> Node {
