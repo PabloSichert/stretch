@@ -162,6 +162,7 @@ fn compute_internal(
 ) -> ComputeResult {
     // Define some general constants we will need for the remainder
     // of the algorithm.
+
     let dir = node.flex_direction;
     let is_row = dir.is_row();
     let is_column = dir.is_column();

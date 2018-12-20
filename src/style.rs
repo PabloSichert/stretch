@@ -206,6 +206,8 @@ impl Default for Size<Dimension> {
 
 #[repr(C)]
 pub struct StyleNode {
+    pub display: Display,
+
     pub position_type: PositionType,
     pub direction: Direction,
     pub flex_direction: FlexDirection,
@@ -246,6 +248,8 @@ impl StyleNode {
         );
 
         let node = Node {
+            display: (*style).display,
+
             position_type: (*style).position_type,
             direction: (*style).direction,
             flex_direction: (*style).flex_direction,
@@ -363,6 +367,8 @@ impl Node {
         };
 
         let style = StyleNode {
+            display: (*node).display,
+
             position_type: (*node).position_type,
             direction: (*node).direction,
             flex_direction: (*node).flex_direction,
