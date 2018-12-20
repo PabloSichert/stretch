@@ -14,7 +14,7 @@ lto = true
 panic = 'abort'
 
 [lib]
-crate-type = ["dylib"]
+crate-type = ["staticlib"]
 
 [[bench]]
 name = "generated"

@@ -1,4 +1,6 @@
 use std::f32;
+use std::mem;
+use std::ffi::c_void;
 
 use crate::layout;
 
@@ -54,14 +56,49 @@ struct FlexLine<'a> {
 }
 
 #[no_mangle]
-pub extern "C" fn unsafe_compute(root: &style::StyleNode) -> layout::LayoutNode {
-    // TODO: Need to check if Rust tries to clean up the root that was allocated in C
-    compute(&root.to_node()).to_layout_node()
+pub extern "C" fn create_style_node() -> *mut style::StyleNode {
+    let node: style::Node = Default::default();
+    let style = style::Node::to_style_node(Box::new(node));
+
+    Box::into_raw(style)
 }
 
 #[no_mangle]
-pub extern "C" fn cleanup(layout: &layout::LayoutNode) {
-    drop(&layout.to_node())
+pub unsafe extern "C" fn add_style_node(style: *mut style::StyleNode, child: *const style::StyleNode) {
+    let mut children = Vec::from_raw_parts(
+        (*style).children.pointer as *mut style::Node,
+        (*style).children.length,
+        (*style).children.capacity
+    );
+
+    let node = *style::StyleNode::to_node(child);
+
+    children.push(node);
+
+    (*style).children.pointer = children.as_ptr() as *const c_void;
+    (*style).children.length = children.len();
+    (*style).children.capacity = children.capacity();
+
+    mem::forget(children);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn compute_layout_node(root: *const style::StyleNode) -> *mut layout::LayoutNode {
+    let node = style::StyleNode::to_node(root);
+    let layout = layout::Node::to_layout_node(&compute(&node));
+
+    Box::into_raw(node);
+    Box::into_raw(layout)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn cleanup_layout_node(node: *mut layout::LayoutNode) {
+    Box::from_raw(node);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn cleanup_style_node(node: *mut style::StyleNode) {
+    Box::from_raw(node);
 }
 
 pub fn compute(root: &style::Node) -> layout::Node {
@@ -123,7 +160,6 @@ fn compute_internal(
 ) -> ComputeResult {
     // Define some general constants we will need for the remainder
     // of the algorithm.
-
     let dir = node.flex_direction;
     let is_row = dir.is_row();
     let is_column = dir.is_column();

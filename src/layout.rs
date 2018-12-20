@@ -1,4 +1,4 @@
-use std::mem;
+use std::ffi::c_void;
 use crate::geometry::{Point, Size};
 use crate::array::Array;
 
@@ -7,25 +7,7 @@ use crate::array::Array;
 pub struct LayoutNode {
     pub size: Size<f32>,
     pub location: Point<f32>,
-    pub children: Array<LayoutNode>,
-}
-
-impl LayoutNode {
-    pub(crate) fn to_node(&self) -> Node {
-        unsafe {
-            let children = Vec::from_raw_parts(
-                self.children.pointer,
-                self.children.length,
-                self.children.capacity
-            ).iter().map(|child| child.to_node()).collect();
-
-            Node {
-                size: self.size,
-                location: self.location,
-                children: children,
-            }
-        }
-    }
+    pub children: Array<c_void>,
 }
 
 #[derive(Debug)]
@@ -36,23 +18,19 @@ pub struct Node {
 }
 
 impl Node {
-    pub(crate) fn to_layout_node(&self) -> LayoutNode {
-        let mut children_vec: Vec<LayoutNode> = self.children.iter().map(|child| child.to_layout_node()).collect();
-
-        children_vec.shrink_to_fit();
-
+    pub(crate) unsafe fn to_layout_node(node: *const Node) -> Box<LayoutNode> {
         let children = Array {
-            pointer: children_vec.as_mut_ptr(),
-            length: children_vec.len(),
-            capacity: children_vec.capacity()
+            pointer: (*node).children.as_ptr() as *const c_void,
+            length: (*node).children.len(),
+            capacity: (*node).children.capacity(),
         };
 
-        mem::forget(children_vec);
-
-        LayoutNode {
-            size: self.size,
-            location: self.location,
+        let layout = LayoutNode {
+            size: (*node).size,
+            location: (*node).location,
             children: children,
-        }
+        };
+
+        Box::new(layout)
     }
 }

@@ -1,3 +1,4 @@
+use std::ffi::c_void;
 use crate::geometry::{Rect, Size};
 use crate::number::Number;
 use crate::array::Array;
@@ -233,50 +234,50 @@ pub struct StyleNode {
 
     pub aspect_ratio: Number,
 
-    pub children: Array<StyleNode>,
+    pub children: Array<c_void>,
 }
 
 impl StyleNode {
-    pub(crate) fn to_node(&self) -> Node {
-        unsafe {
-            let children = Vec::from_raw_parts(
-                self.children.pointer,
-                self.children.length,
-                self.children.capacity
-            ).iter().map(|child| child.to_node()).collect();
+    pub(crate) unsafe fn to_node(style: *const StyleNode) -> Box<Node> {
+        let children = Vec::from_raw_parts(
+            (*style).children.pointer as *mut Node,
+            (*style).children.length,
+            (*style).children.capacity
+        );
 
-            Node {
-                position_type: self.position_type,
-                direction: self.direction,
-                flex_direction: self.flex_direction,
+        let node = Node {
+            position_type: (*style).position_type,
+            direction: (*style).direction,
+            flex_direction: (*style).flex_direction,
 
-                flex_wrap: self.flex_wrap,
-                overflow: self.overflow,
+            flex_wrap: (*style).flex_wrap,
+            overflow: (*style).overflow,
 
-                align_items: self.align_items,
-                align_self: self.align_self,
-                align_content: self.align_content,
+            align_items: (*style).align_items,
+            align_self: (*style).align_self,
+            align_content: (*style).align_content,
 
-                justify_content: self.justify_content,
+            justify_content: (*style).justify_content,
 
-                position: self.position,
-                margin: self.margin,
-                padding: self.padding,
-                border: self.border,
+            position: (*style).position,
+            margin: (*style).margin,
+            padding: (*style).padding,
+            border: (*style).border,
 
-                flex_grow: self.flex_grow,
-                flex_shrink: self.flex_shrink,
-                flex_basis: self.flex_basis,
+            flex_grow: (*style).flex_grow,
+            flex_shrink: (*style).flex_shrink,
+            flex_basis: (*style).flex_basis,
 
-                size: self.size,
-                min_size: self.min_size,
-                max_size: self.max_size,
+            size: (*style).size,
+            min_size: (*style).min_size,
+            max_size: (*style).max_size,
 
-                aspect_ratio: self.aspect_ratio,
+            aspect_ratio: (*style).aspect_ratio,
 
-                children: children,
-            }
-        }
+            children: children,
+        };
+
+        Box::new(node)
     }
 }
 
@@ -350,6 +351,48 @@ impl Default for Node {
 }
 
 impl Node {
+    pub(crate) fn to_style_node(node: Box<Node>) -> Box<StyleNode> {
+        let children = Array {
+            pointer: (*node).children.as_ptr() as *const c_void,
+            length: (*node).children.len(),
+            capacity: (*node).children.capacity(),
+        };
+
+        let style = StyleNode {
+            position_type: (*node).position_type,
+            direction: (*node).direction,
+            flex_direction: (*node).flex_direction,
+
+            flex_wrap: (*node).flex_wrap,
+            overflow: (*node).overflow,
+
+            align_items: (*node).align_items,
+            align_self: (*node).align_self,
+            align_content: (*node).align_content,
+
+            justify_content: (*node).justify_content,
+
+            position: (*node).position,
+            margin: (*node).margin,
+            padding: (*node).padding,
+            border: (*node).border,
+
+            flex_grow: (*node).flex_grow,
+            flex_shrink: (*node).flex_shrink,
+            flex_basis: (*node).flex_basis,
+
+            size: (*node).size,
+            min_size: (*node).min_size,
+            max_size: (*node).max_size,
+
+            aspect_ratio: (*node).aspect_ratio,
+
+            children: children,
+        };
+
+        Box::new(style)
+    }
+
     pub(crate) fn min_main_size(&self, direction: FlexDirection) -> Dimension {
         match direction {
             FlexDirection::Row | FlexDirection::RowReverse => self.min_size.width,
