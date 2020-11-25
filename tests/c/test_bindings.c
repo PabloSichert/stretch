@@ -16,6 +16,14 @@ int main() {
 
     StyleNode *node = stretch_new_style();
 
+    for (int i = 0; i < 300; i++) {
+        StyleNode *child = stretch_new_style();
+        child->size.width.unit = UNIT_POINTS;
+        child->size.width.value = 1.0f;
+
+        stretch_add_child(node, child);
+    }
+
     stretch_add_child(node, child1);
     stretch_add_child(node, child2);
 
@@ -24,7 +32,7 @@ int main() {
     stretch_cleanup_style(node);
 
     assert(layout->size.height == 432.0);
-    assert(layout->size.width == 357.0);
+    assert(layout->size.width == 657.0);
 
     stretch_cleanup_layout(layout);
 }
